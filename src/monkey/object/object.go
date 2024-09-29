@@ -29,6 +29,7 @@ const (
 	FUNCTION_OBJ          = "FUNCTION"
 	COMPILED_FUNCTION_OBJ = "COMPILED_FUNCTION_OBJ"
 	BUILTIN_OBJ           = "BUILTIN"
+	CLOSURE_OBJ           = "CLOSURE"
 
 	ARRAY_OBJ = "ARRAY"
 	HASH_OBJ  = "HASH"
@@ -131,6 +132,23 @@ func (cf *CompiledFunction) Inspect() string {
 	return fmt.Sprintf("CompiledFunction[%p]", cf)
 }
 
+type Builtin struct {
+	Fn BuiltinFunction
+}
+
+func (b *Builtin) Type() ObjectType { return BUILTIN_OBJ }
+func (b *Builtin) Inspect() string  { return "builtin function" }
+
+type Closure struct {
+	Fn   *CompiledFunction
+	Free []Object
+}
+
+func (c *Closure) Type() ObjectType { return CLOSURE_OBJ }
+func (c *Closure) Inspect() string {
+	return fmt.Sprintf("Closure[%p]", c)
+}
+
 type String struct {
 	Value string
 }
@@ -143,13 +161,6 @@ func (s *String) HashKey() HashKey {
 
 	return HashKey{Type: s.Type(), Value: h.Sum64()}
 }
-
-type Builtin struct {
-	Fn BuiltinFunction
-}
-
-func (b *Builtin) Type() ObjectType { return BUILTIN_OBJ }
-func (b *Builtin) Inspect() string  { return "builtin function" }
 
 type Array struct {
 	Elements []Object
